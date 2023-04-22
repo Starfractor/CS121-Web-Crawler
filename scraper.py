@@ -1,6 +1,6 @@
 import re
+from urllib.parse import urlparse
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse, urljoin
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -26,6 +26,11 @@ def is_valid(url):
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
             return False
+
+        # Crawl only the specified domains and paths
+        if not re.match(r"^(?:http|https)://(?:www\.)?(?:ics\.uci\.edu|cs\.uci\.edu|informatics\.uci\.edu|stat\.uci\.edu)/.*", url):
+            return False
+
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
@@ -37,5 +42,5 @@ def is_valid(url):
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
 
     except TypeError:
-        print ("TypeError for ", parsed)
+        print("TypeError for ", parsed)
         raise
