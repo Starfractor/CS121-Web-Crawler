@@ -27,7 +27,7 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
 
-        # Crawl only the specified domains and paths
+        # Crawl only the specified domains and paths stated in the assignment
         if not re.match(r"^(?:http|https)://(?:www\.)?(?:ics\.uci\.edu|cs\.uci\.edu|informatics\.uci\.edu|stat\.uci\.edu)/.*", url):
             return False
 
