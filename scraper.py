@@ -1,15 +1,12 @@
 import re
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urlparse, urljoin, urldefrag
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse
-from collections import defaultdict
+
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
-    if links:
-        return [link for link in links if is_valid(link)]
-    else:
-        return []
+    return [link for link in links if is_valid(link)]
+
 
 def extract_next_links(url, resp):
     # Implementation required.
@@ -27,14 +24,13 @@ def extract_next_links(url, resp):
     soup = BeautifulSoup(resp.raw_response.content, "html.parser")
     links = [link.get("href") for link in soup.find_all("a")]
 
-    # Convert relative links to absolute links using the base url
-    absolute_links = [urljoin(url, link) for link in links]
+    # Transform relative URLs to absolute URLs
+    absolute_links = [urljoin(resp.url, link) for link in links]
 
-    return absolute_links
+    # Defragment the URLs
+    defragmented_links = [urldefrag(link).url for link in absolute_links]
 
-    new_urls = []
-
-    return list()
+    return defragmented_links
 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
@@ -67,8 +63,6 @@ def is_valid(url):
         print("TypeError for ", parsed)
         raise
 
-
-# These fucntions are for trap prevention
 
 def urlIsInvalid(url):
     # Additional bad queries
