@@ -1,6 +1,8 @@
 import re
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin, urldefrag
 from collections import defaultdict
+from bs4 import BeautifulSoup
+from urllib.robotparser import RobotFileParser
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -9,10 +11,18 @@ def scraper(url, resp):
     else:
         return []
 
+robot_parsers = {}
+    
+def get_robot(url):
+    domain = urlparse(url).scheme + '://' + urlparse(url).hostname
+    if domain not in robot_parsers:
+        robot_parser = RobotFileParser()
+        robot_parser.set_url(urljoin(domain, '/robots.txt'))
+        robot_parser.read()
+        robot_parsers[domain] = robot_parser
+
 def extract_next_links(url, resp):
-    if resp.status.equals(200):
-        return resp.raw_response.content
-    # Implementation required.
+     # Implementation required.
     # url: the URL that was used to get the page
     # resp.url: the actual url of the page
     # resp.status: the status code returned by the server. 200 is OK, you got the page. Other numbers mean that there was some kind of problem.
@@ -22,10 +32,23 @@ def extract_next_links(url, resp):
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
 
-    new_urls = []
+    # Detect and avoid dead URLs that return a 200 status but no data
+    if resp.status != 200 or resp.error:
+        return []
 
-    return list()
+    soup = BeautifulSoup(resp.raw_response.content, "html.parser")
+    links = [link.get("href") for link in soup.find_all("a")]
 
+    allowed_links = []
+    for link in links:
+        absolute_links = urljoin(url, link) # Converts relative URLs to absolute URLs
+        defrag_link, _ = urldefrag(absolute_links) # Defragments the URL
+        robot_parser = get_robot(defrag_link)
+        if robot_parser.can_fetch("*", defrag_link):
+            allowed_links.append(defrag_link)
+
+    return allowed_links
+ 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
     # If you decide to crawl it, return True; otherwise return False.
@@ -33,6 +56,10 @@ def is_valid(url):
     try:
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
+            return False
+        
+        # Crawl only the specified domains and paths stated in the assignment
+        if not re.match(r".*\.ics\.uci\.edu/.*|.*\.cs\.uci\.edu/.*|.*\.informatics\.uci\.edu/.*|.*\.stat\.uci\.edu/.*", url):
             return False
         
         if urlIsInvalid(url):
@@ -53,7 +80,7 @@ def is_valid(url):
         raise
 
 
-# These fucntions are for trap prevention
+# These functions are for trap prevention
 
 def urlIsInvalid(url):
     # Additional bad queries
