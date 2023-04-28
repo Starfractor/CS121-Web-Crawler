@@ -84,14 +84,23 @@ def extract_next_links(url, resp):
                     # Use Beautiful Soup
                     soup = BeautifulSoup(resp.raw_response.content, 'lxml')
 
-                    # Count words in the page
+                    # Count words in the page and Check if page is low value
                     text = soup.get_text()
                     words = nltk.word_tokenize(text)
                     words = [word.lower() for word in words if word.isalpha()]
                     words = [word for word in words if word not in STOPWORDS]
-                    scraper_data.word_counts.update(words)
 
-                    # Check if this page is the longest
+                    if len(words) < 50:  # Check word count
+                        return new_urls
+                    common_words = [word for word in words if word in STOPWORDS]
+                    if len(common_words) / len(words) > 0.8:  # Check proportion of common words
+                        return new_urls
+                    most_common_word_count = Counter(words).most_common(1)[0][1]
+                    if most_common_word_count / len(words) > 0.2:  # Check diversity of words
+                        return new_urls
+                    
+                    # If the page is not low value, update word counts and longest page
+                    scraper_data.word_counts.update(words)
                     if len(words) > scraper_data.longest_page[1]:
                         scraper_data.longest_page = (url, len(words))
 
