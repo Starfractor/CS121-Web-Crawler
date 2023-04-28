@@ -2,20 +2,38 @@
 import re
 from urllib.parse import urlparse, urljoin, urldefrag
 from urllib import robotparser
-from collections import defaultdict
+from collections import defaultdict, Counter
 from bs4 import BeautifulSoup
+import urllib.request
 import nltk
 import lxml
+import threading
 
 # Extra file imports
 from scraper_data import ScraperData
 from stopwords import STOPWORDS
 
-# The URLS we want to visit
+# The URLS we want to visit``
 valid_urls = {".ics.uci.edu", ".cs.uci.edu", ".informatics.uci.edu", ".stat.uci.edu"}
 
 # Saves data about our scrapper
 scraper_data = ScraperData()
+
+def print_report():
+    print("Crawler Report:")
+    print("Visited URLs: ", len(scraper_data.visited))
+    for domain, count in scraper_data.stats.items():
+        print("Domain: ", domain, " Visited: ", count)
+    print("Longest page (by word count): ", scraper_data.longest_page)
+    print("50 most common words: ", scraper_data.word_counts.most_common(50))
+    print("Subdomains:")
+    for subdomain, urls in scraper_data.subdomains.items():
+        print("Subdomain: ", subdomain, " Unique pages: ", len(urls))
+
+# Set a timer to call print_report every 30 minutes
+def set_report_timer():
+    threading.Timer(1800, set_report_timer).start()
+    print_report()
 
 # Main scrapper
 def scraper(url, resp):
@@ -25,10 +43,11 @@ def scraper(url, resp):
     else:
         return []
 
+set_report_timer()
 
 # Get next links
 def extract_next_links(url, resp):
-    # Implementation required.
+     # Implementation required.
     # url: the URL that was used to get the page
     # resp.url: the actual url of the page
     # resp.status: the status code returned by the server. 200 is OK, you got the page. Other numbers mean that there was some kind of problem.
@@ -47,21 +66,33 @@ def extract_next_links(url, resp):
             url = resp.raw_response.url
 
         scraper_data.visited.add(url)
+        domain = urlparse(url).netloc
+        scraper_data.stats[domain] += 1
+        scraper_data.subdomains[domain].add(url)
         
         # Read url data if we get status 200
         if resp.status == 200:
             # Make robot parser
             rp = robotparser.RobotFileParser()
-            robot_page = urlparse(url).scheme + '://' + \
-                urlparse(url).netloc + '/robots.txt'
+            robot_page = urlparse(url).scheme + '://' + urlparse(url).netloc + '/robots.txt'
             rp.set_url(robot_page)
             rp.read()
                        
             # Check if we can get data form url if it exists
-            if rp.can_fetch("*", url):
-                    
+            if rp.can_fetch("*", url):       
                     # Use Beautiful Soup
                     soup = BeautifulSoup(resp.raw_response.content, 'lxml')
+
+                    # Count words in the page
+                    text = soup.get_text()
+                    words = nltk.word_tokenize(text)
+                    words = [word.lower() for word in words if word.isalpha()]
+                    words = [word for word in words if word not in STOPWORDS]
+                    scraper_data.word_counts.update(words)
+
+                    # Check if this page is the longest
+                    if len(words) > scraper_data.longest_page[1]:
+                        scraper_data.longest_page = (url, len(words))
 
                     # Get all links
                     for link in soup.find_all('a'):
@@ -74,16 +105,24 @@ def extract_next_links(url, resp):
                                 if valid_domain in final_domain:
                                     new_urls.append(final)
                                     break
-
+                                
+        # Respond to redirecting error codes
+        elif resp.status in [300, 301, 302, 303, 307, 308]:
+            response = urllib.request.urlopen(url)
+            redirect = response.geturl()
+            redirect_domain = urlparse(redirect).netloc
+            if (redirect not in scraper_data.visited):
+                for valid_url_domain in valid_url_domain:
+                    if (valid_url_domain in redirect_domain):
+                        new_urls.append(redirect)
+                        break                           
                         
         return new_urls
     
     except:
         print("URL cannot be opened. Skipping URL:", url)
         return new_urls
-
-    return list()
-
+ 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
     # If you decide to crawl it, return True; otherwise return False.
@@ -94,10 +133,8 @@ def is_valid(url):
             return False
         
         # Check through list of invalid queries
-        invalid_queries = ['ical=', 'mailto:', 'image=', '=download', '=login', '=edit', 'replytocom=', '~eppstein/pix', '.calendar.', '/ml/datasets.php?']
-        for invalid_query in invalid_queries:
-            if invalid_query in url:
-                return False
+        if urlIsInvalid(url):
+            return False
             
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
@@ -114,7 +151,7 @@ def is_valid(url):
         raise
 
 
-# These fucntions are for trap prevention
+# These functions are for trap prevention
 
 def urlIsInvalid(url):
     # Additional bad queries
@@ -144,5 +181,3 @@ def urlContainsRepeatingPaths(url):
             return True
     
     return False
-
-            
