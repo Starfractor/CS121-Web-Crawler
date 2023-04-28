@@ -6,6 +6,7 @@ from collections import defaultdict, Counter
 from bs4 import BeautifulSoup
 import nltk
 import lxml
+import threading
 
 # Extra file imports
 from scraper_data import ScraperData
@@ -165,4 +166,9 @@ def print_report():
     print("Subdomains:")
     for subdomain, urls in scraper_data.subdomains.items():
         print("Subdomain: ", subdomain, " Unique pages: ", len(urls))
+
+# Set a timer to call print_report every 30 minutes
+def set_report_timer():
+    threading.Timer(1800, set_report_timer).start()
+    print_report()
             
