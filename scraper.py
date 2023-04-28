@@ -2,7 +2,7 @@
 import re
 from urllib.parse import urlparse, urljoin, urldefrag
 from urllib import robotparser
-from collections import defaultdict
+from collections import defaultdict, Counter
 from bs4 import BeautifulSoup
 import nltk
 import lxml
@@ -11,7 +11,7 @@ import lxml
 from scraper_data import ScraperData
 from stopwords import STOPWORDS
 
-# The URLS we want to visit
+# The URLS we want to visit``
 valid_urls = {".ics.uci.edu", ".cs.uci.edu", ".informatics.uci.edu", ".stat.uci.edu"}
 
 # Saves data about our scrapper
@@ -47,21 +47,33 @@ def extract_next_links(url, resp):
             url = resp.raw_response.url
 
         scraper_data.visited.add(url)
+        domain = urlparse(url).netloc
+        scraper_data.stats[domain] += 1
+        scraper_data.subdomains[domain].add(url)
         
         # Read url data if we get status 200
         if resp.status == 200:
             # Make robot parser
             rp = robotparser.RobotFileParser()
-            robot_page = urlparse(url).scheme + '://' + \
-                urlparse(url).netloc + '/robots.txt'
+            robot_page = urlparse(url).scheme + '://' + urlparse(url).netloc + '/robots.txt'
             rp.set_url(robot_page)
             rp.read()
                        
             # Check if we can get data form url if it exists
-            if rp.can_fetch("*", url):
-                    
+            if rp.can_fetch("*", url):       
                     # Use Beautiful Soup
                     soup = BeautifulSoup(resp.raw_response.content, 'lxml')
+
+                    # Count words in the page
+                    text = soup.get_text()
+                    words = nltk.word_tokenize(text)
+                    words = [word.lower() for word in words if word.isalpha()]
+                    words = [word for word in words if word not in STOPWORDS]
+                    scraper_data.word_counts.update(words)
+
+                    # Check if this page is the longest
+                    if len(words) > scraper_data.longest_page[1]:
+                        scraper_data.longest_page = (url, len(words))
 
                     # Get all links
                     for link in soup.find_all('a'):
@@ -81,8 +93,6 @@ def extract_next_links(url, resp):
     except:
         print("URL cannot be opened. Skipping URL:", url)
         return new_urls
-
-    return allowed_links
  
 def is_valid(url):
     # Decide whether to crawl this url or not. 
@@ -145,4 +155,14 @@ def urlContainsRepeatingPaths(url):
     
     return False
 
+def print_report():
+    print("Crawler Report:")
+    print("Visited URLs: ", len(scraper_data.visited))
+    for domain, count in scraper_data.stats.items():
+        print("Domain: ", domain, " Visited: ", count)
+    print("Longest page (by word count): ", scraper_data.longest_page)
+    print("50 most common words: ", scraper_data.word_counts.most_common(50))
+    print("Subdomains:")
+    for subdomain, urls in scraper_data.subdomains.items():
+        print("Subdomain: ", subdomain, " Unique pages: ", len(urls))
             
