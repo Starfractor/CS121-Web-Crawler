@@ -20,15 +20,16 @@ valid_urls = {".ics.uci.edu", ".cs.uci.edu", ".informatics.uci.edu", ".stat.uci.
 scraper_data = ScraperData()
 
 def print_report():
-    print("Crawler Report:")
-    print("Visited URLs: ", len(scraper_data.visited))
-    for domain, count in scraper_data.stats.items():
-        print("Domain: ", domain, " Visited: ", count)
-    print("Longest page (by word count): ", scraper_data.longest_page)
-    print("50 most common words: ", scraper_data.word_counts.most_common(50))
-    print("Subdomains:")
-    for subdomain, urls in scraper_data.subdomains.items():
-        print("Subdomain: ", subdomain, " Unique pages: ", len(urls))
+    with open("report.txt", "w") as f:
+        f.write("Crawler Report:\n")
+        f.write("Visited URLs: " + str(len(scraper_data.visited)) + "\n")
+        for domain, count in scraper_data.stats.items():
+            f.write("Domain: " + str(domain) + " Visited: " + str(count) + "\n")
+        f.write("Longest page (by word count): " + str(scraper_data.longest_page) + "\n")
+        f.write("50 most common words: " + str(scraper_data.word_counts.most_common(50)) + "\n")
+        f.write("Subdomains:\n")
+        for subdomain, urls in scraper_data.subdomains.items():
+            f.write("Subdomain: " + str(subdomain) + " Unique pages: " + str(len(urls)) + "\n")
 
 # Set a timer to call print_report every 30 minutes
 def set_report_timer():
