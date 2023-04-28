@@ -18,6 +18,22 @@ valid_urls = {".ics.uci.edu", ".cs.uci.edu", ".informatics.uci.edu", ".stat.uci.
 # Saves data about our scrapper
 scraper_data = ScraperData()
 
+def print_report():
+    print("Crawler Report:")
+    print("Visited URLs: ", len(scraper_data.visited))
+    for domain, count in scraper_data.stats.items():
+        print("Domain: ", domain, " Visited: ", count)
+    print("Longest page (by word count): ", scraper_data.longest_page)
+    print("50 most common words: ", scraper_data.word_counts.most_common(50))
+    print("Subdomains:")
+    for subdomain, urls in scraper_data.subdomains.items():
+        print("Subdomain: ", subdomain, " Unique pages: ", len(urls))
+
+# Set a timer to call print_report every 30 minutes
+def set_report_timer():
+    threading.Timer(1800, set_report_timer).start()
+    print_report()
+
 # Main scrapper
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -26,6 +42,7 @@ def scraper(url, resp):
     else:
         return []
 
+set_report_timer()
 
 # Get next links
 def extract_next_links(url, resp):
@@ -155,20 +172,3 @@ def urlContainsRepeatingPaths(url):
             return True
     
     return False
-
-def print_report():
-    print("Crawler Report:")
-    print("Visited URLs: ", len(scraper_data.visited))
-    for domain, count in scraper_data.stats.items():
-        print("Domain: ", domain, " Visited: ", count)
-    print("Longest page (by word count): ", scraper_data.longest_page)
-    print("50 most common words: ", scraper_data.word_counts.most_common(50))
-    print("Subdomains:")
-    for subdomain, urls in scraper_data.subdomains.items():
-        print("Subdomain: ", subdomain, " Unique pages: ", len(urls))
-
-# Set a timer to call print_report every 30 minutes
-def set_report_timer():
-    threading.Timer(1800, set_report_timer).start()
-    print_report()
-            
