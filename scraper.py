@@ -11,13 +11,13 @@ import lxml
 from scraper_data import ScraperData
 from stopwords import STOPWORDS
 
-# The URLS we want to visit``
+# The URLS we want to visit
 valid_urls = {".ics.uci.edu", ".cs.uci.edu", ".informatics.uci.edu", ".stat.uci.edu"}
 
-# Saves data about our scrapper
+# Saves data about our scrapper, uses the ScraperData class to store information on visited pages, stats, longest_page, word_counts, and subdomains. 
 scraper_data = ScraperData()
 
-# Main scrapper
+# Main scrapper. It filters through all the links that were found and returns only the ones that pass the is_valid function tests. 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
     if links:
@@ -28,7 +28,6 @@ def scraper(url, resp):
 
 # Get next links
 def extract_next_links(url, resp):
-     # Implementation required.
     # url: the URL that was used to get the page
     # resp.url: the actual url of the page
     # resp.status: the status code returned by the server. 200 is OK, you got the page. Other numbers mean that there was some kind of problem.
@@ -141,14 +140,14 @@ def urlIsInvalid(url):
 
 def urlContainsRepeatingPaths(url):
 
-    # Create dict of path counts
+    # Create dict of already visited path counts.
     subpath_count = defaultdict(int)
     path = urlparse(url).path
     for s in path.split("/"):
         if s != "":
             subpath_count[s] += 1
     
-    # Check if we have duplicates 
+    # Check if we have duplicates (this is exact copies)
     for count in subpath_count.values():
         if count > 1:
             return True
