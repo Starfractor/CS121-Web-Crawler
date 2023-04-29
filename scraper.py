@@ -16,12 +16,13 @@ from datasketch import MinHash
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
-# The URLS we want to visit``
+# The URLS we want to visit
 valid_urls = {".ics.uci.edu", ".cs.uci.edu", ".informatics.uci.edu", ".stat.uci.edu"}
 
-# Saves data about our scrapper
+# Saves data about our scrapper, uses the ScraperData class to store information on visited pages, stats, longest_page, word_counts, and subdomains. 
 scraper_data = ScraperData()
 
+# Prints the information needed for reports. Uses data from ScraperData class. 
 def print_report():
     with open("report.txt", "w") as f:
         f.write("Crawler Report:\n")
@@ -39,7 +40,7 @@ def set_report_timer():
     threading.Timer(1800, set_report_timer).start()
     print_report()
 
-# Main scrapper
+# Main scrapper. It filters through all the links that were found and returns only the ones that pass the is_valid function tests. 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
     if links:
@@ -195,14 +196,14 @@ def urlIsInvalid(url):
 
 def urlContainsRepeatingPaths(url):
 
-    # Create dict of path counts
+    # Create dict of already visited path counts.
     subpath_count = defaultdict(int)
     path = urlparse(url).path
     for s in path.split("/"):
         if s != "":
             subpath_count[s] += 1
     
-    # Check if we have duplicates 
+    # Check if we have duplicates (this is exact copies)
     for count in subpath_count.values():
         if count > 1:
             return True
