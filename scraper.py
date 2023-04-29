@@ -12,6 +12,9 @@ import threading
 # Extra file imports
 from scraper_data import ScraperData
 from stopwords import STOPWORDS
+from datasketch import MinHash
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 
 # The URLS we want to visit``
 valid_urls = {".ics.uci.edu", ".cs.uci.edu", ".informatics.uci.edu", ".stat.uci.edu"}
@@ -48,7 +51,7 @@ set_report_timer()
 
 # Get next links
 def extract_next_links(url, resp):
-     # Implementation required.
+    # Implementation required.
     # url: the URL that was used to get the page
     # resp.url: the actual url of the page
     # resp.status: the status code returned by the server. 200 is OK, you got the page. Other numbers mean that there was some kind of problem.
@@ -89,6 +92,20 @@ def extract_next_links(url, resp):
                     words = nltk.word_tokenize(text)
                     words = [word.lower() for word in words if word.isalpha()]
                     words = [word for word in words if word not in STOPWORDS]
+
+                    # Compute the MinHash for the page
+                    m = MinHash(num_perm=128)
+                    for word in words:
+                        m.update(word.encode('utf8'))
+
+                    # Compare with MinHashes of previously visited pages
+                    for visited_url, visited_minhash in scraper_data.page_minhashes.items():
+                        similarity = m.jaccard(visited_minhash)
+                        if similarity > 0.9:  # If the pages are very similar don't visit this page
+                            return new_urls
+
+                    # If the page is not similar to any visited page, add it to the list
+                    scraper_data.page_minhashes[url] = m
 
                     if len(words) < 50:  # Check word count
                         return new_urls
