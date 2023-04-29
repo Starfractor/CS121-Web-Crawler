@@ -18,7 +18,7 @@ valid_urls = {".ics.uci.edu", ".cs.uci.edu", ".informatics.uci.edu", ".stat.uci.
 # Saves data about our scrapper, uses the ScraperData class to store information on visited pages, stats, longest_page, word_counts, and subdomains. 
 scraper_data = ScraperData()
 
-# Main scrapper. It filters through all the links that were found and returns only the ones that pass the is_valid function tests. 
+# Prints the information needed for reports. Uses data from ScraperData class. 
 def print_report():
     print("Crawler Report:")
     print("Visited URLs: ", len(scraper_data.visited))
@@ -35,7 +35,7 @@ def set_report_timer():
     threading.Timer(1800, set_report_timer).start()
     print_report()
 
-# Main scrapper
+# Main scrapper. It filters through all the links that were found and returns only the ones that pass the is_valid function tests. 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
     if links:
