@@ -4,6 +4,7 @@ from urllib.parse import urlparse, urljoin, urldefrag
 from urllib import robotparser
 from collections import defaultdict, Counter
 from bs4 import BeautifulSoup
+import urllib.request
 import nltk
 import lxml
 import threading
@@ -20,15 +21,16 @@ scraper_data = ScraperData()
 
 # Prints the information needed for reports. Uses data from ScraperData class. 
 def print_report():
-    print("Crawler Report:")
-    print("Visited URLs: ", len(scraper_data.visited))
-    for domain, count in scraper_data.stats.items():
-        print("Domain: ", domain, " Visited: ", count)
-    print("Longest page (by word count): ", scraper_data.longest_page)
-    print("50 most common words: ", scraper_data.word_counts.most_common(50))
-    print("Subdomains:")
-    for subdomain, urls in scraper_data.subdomains.items():
-        print("Subdomain: ", subdomain, " Unique pages: ", len(urls))
+    with open("report.txt", "w") as f:
+        f.write("Crawler Report:\n")
+        f.write("Visited URLs: " + str(len(scraper_data.visited)) + "\n")
+        for domain, count in scraper_data.stats.items():
+            f.write("Domain: " + str(domain) + " Visited: " + str(count) + "\n")
+        f.write("Longest page (by word count): " + str(scraper_data.longest_page) + "\n")
+        f.write("50 most common words: " + str(scraper_data.word_counts.most_common(50)) + "\n")
+        f.write("Subdomains:\n")
+        for subdomain, urls in scraper_data.subdomains.items():
+            f.write("Subdomain: " + str(subdomain) + " Unique pages: " + str(len(urls)) + "\n")
 
 # Set a timer to call print_report every 30 minutes
 def set_report_timer():
@@ -82,14 +84,23 @@ def extract_next_links(url, resp):
                     # Use Beautiful Soup
                     soup = BeautifulSoup(resp.raw_response.content, 'lxml')
 
-                    # Count words in the page
+                    # Count words in the page and Check if page is low value
                     text = soup.get_text()
                     words = nltk.word_tokenize(text)
                     words = [word.lower() for word in words if word.isalpha()]
                     words = [word for word in words if word not in STOPWORDS]
-                    scraper_data.word_counts.update(words)
 
-                    # Check if this page is the longest
+                    if len(words) < 50:  # Check word count
+                        return new_urls
+                    common_words = [word for word in words if word in STOPWORDS]
+                    if len(common_words) / len(words) > 0.8:  # Check proportion of common words
+                        return new_urls
+                    most_common_word_count = Counter(words).most_common(1)[0][1]
+                    if most_common_word_count / len(words) > 0.2:  # Check diversity of words
+                        return new_urls
+                    
+                    # If the page is not low value, update word counts and longest page
+                    scraper_data.word_counts.update(words)
                     if len(words) > scraper_data.longest_page[1]:
                         scraper_data.longest_page = (url, len(words))
 
@@ -104,7 +115,17 @@ def extract_next_links(url, resp):
                                 if valid_domain in final_domain:
                                     new_urls.append(final)
                                     break
-
+                                
+        # Respond to redirecting error codes
+        elif resp.status in [300, 301, 302, 303, 307, 308]:
+            response = urllib.request.urlopen(url)
+            redirect = response.geturl()
+            redirect_domain = urlparse(redirect).netloc
+            if (redirect not in scraper_data.visited):
+                for valid_url_domain in valid_url_domain:
+                    if (valid_url_domain in redirect_domain):
+                        new_urls.append(redirect)
+                        break                           
                         
         return new_urls
     
@@ -122,10 +143,8 @@ def is_valid(url):
             return False
         
         # Check through list of invalid queries
-        invalid_queries = ['ical=', 'mailto:', 'image=', '=download', '=login', '=edit', 'replytocom=', '~eppstein/pix', '.calendar.', '/ml/datasets.php?']
-        for invalid_query in invalid_queries:
-            if invalid_query in url:
-                return False
+        if urlIsInvalid(url):
+            return False
             
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
