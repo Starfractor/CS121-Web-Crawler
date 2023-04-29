@@ -72,7 +72,7 @@ def extract_next_links(url, resp):
         scraper_data.subdomains[domain].add(url)
         
         # Read url data if we get status 200
-        if resp.status == 200:
+        if (resp.status == 200):
             # Make robot parser
             rp = robotparser.RobotFileParser()
             robot_page = urlparse(url).scheme + '://' + urlparse(url).netloc + '/robots.txt'
@@ -116,6 +116,12 @@ def extract_next_links(url, resp):
                                     new_urls.append(final)
                                     break
                                 
+## TODOS:
+   # Detect and avoid infinite traps
+   # Detect redirects and if the page redirects your crawler, index the redirected content
+   # Detect and avoid crawling very large files, especially if they have low information value
+   # Detect and avoid crawling very large files, especially if they have low information value
+
         # Respond to redirecting error codes
         elif resp.status in [300, 301, 302, 303, 307, 308]:
             response = urllib.request.urlopen(url)
