@@ -137,8 +137,7 @@ def extract_next_links(url, resp):
 ## TODOS:
    # Detect and avoid infinite traps
    # Detect redirects and if the page redirects your crawler, index the redirected content
-   # Detect and avoid crawling very large files, especially if they have low information value
-   # Detect and avoid crawling very large files, especially if they have low information value
+
 
         # Respond to redirecting error codes
         elif resp.status in [300, 301, 302, 303, 307, 308]:
@@ -149,7 +148,10 @@ def extract_next_links(url, resp):
                 for valid_url_domain in valid_url_domain:
                     if (valid_url_domain in redirect_domain):
                         new_urls.append(redirect)
-                        break                           
+                        break     
+
+   # Detect and avoid crawling very large files, especially if they have low information value
+                              
                         
         return new_urls
     
@@ -215,3 +217,4 @@ def urlContainsRepeatingPaths(url):
             return True
     
     return False
+
