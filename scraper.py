@@ -73,10 +73,14 @@ def extract_next_links(url, resp):
         scraper_data.visited.add(url)
         domain = urlparse(url).netloc
         scraper_data.stats[domain] += 1
-        scraper_data.subdomains[domain].add(url)
+        
         
         # Read url data if we get status 200
         if (resp.status == 200):
+
+            # Check subdomain
+            subdomain_check(urldefrag(url))
+
             # Make robot parser
             rp = robotparser.RobotFileParser()
             robot_page = urlparse(url).scheme + '://' + urlparse(url).netloc + '/robots.txt'
@@ -84,7 +88,8 @@ def extract_next_links(url, resp):
             rp.read()
                        
             # Check if we can get data form url if it exists
-            if rp.can_fetch("*", url):       
+            if rp.can_fetch("*", url): 
+                          
                     # Use Beautiful Soup
                     soup = BeautifulSoup(resp.raw_response.content, 'lxml')
 
@@ -108,7 +113,7 @@ def extract_next_links(url, resp):
                     # If the page is not similar to any visited page, add it to the list
                     scraper_data.page_minhashes[url] = m
 
-                    if len(words) < 50:  # Check word count
+                    if len(words) < 50 or len(words) > 6000:  # Check word count
                         return new_urls
                     common_words = [word for word in words if word in STOPWORDS]
                     if len(common_words) / len(words) > 0.8:  # Check proportion of common words
@@ -133,12 +138,6 @@ def extract_next_links(url, resp):
                                 if valid_domain in final_domain:
                                     new_urls.append(final)
                                     break
-                                
-## TODOS:
-   # Detect and avoid infinite traps
-   # Detect redirects and if the page redirects your crawler, index the redirected content
-   # Detect and avoid crawling very large files, especially if they have low information value
-   # Detect and avoid crawling very large files, especially if they have low information value
 
         # Respond to redirecting error codes
         elif resp.status in [300, 301, 302, 303, 307, 308]:
@@ -184,7 +183,6 @@ def is_valid(url):
         print ("TypeError for ", parsed)
         raise
 
-
 # These functions are for trap prevention
 
 def urlIsInvalid(url):
@@ -215,3 +213,13 @@ def urlContainsRepeatingPaths(url):
             return True
     
     return False
+
+def subdomain_check(url):
+    url = url[0]
+    if "ics.uci.edu" in url:
+        protocol = url.split(':')[0] + '://'
+        second = url.split('//')[1]
+        subdomain = second.split(".")[0]
+        if subdomain and subdomain != 'www':
+            key = protocol + subdomain + ".ics.uci.edu"
+            scraper_data.subdomains[key] += 1
