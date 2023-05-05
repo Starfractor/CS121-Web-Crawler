@@ -1,0 +1,228 @@
+NUMBER OF UNIQUE PAGES FOUND
+6805
+LONGEST PAGE
+https://www.ics.uci.edu/grad/funding/index.php
+LONGEST PAGE COUNT
+3073
+COMMON WORD
+nr 33583
+COMMON WORD
+ics 25028
+COMMON WORD
+hans 22834
+COMMON WORD
+research 17134
+COMMON WORD
+lbx 13354
+COMMON WORD
+information 12939
+COMMON WORD
+computer 12886
+COMMON WORD
+support 12697
+COMMON WORD
+software 12113
+COMMON WORD
+course 11356
+COMMON WORD
+r 10774
+COMMON WORD
+may 10544
+COMMON WORD
+school 10441
+COMMON WORD
+special 10430
+COMMON WORD
+one 10269
+COMMON WORD
+students 10247
+COMMON WORD
+policies 10147
+COMMON WORD
+bren 9997
+COMMON WORD
+music 9901
+COMMON WORD
+computing 9666
+COMMON WORD
+student 9582
+COMMON WORD
+data 9531
+COMMON WORD
+uci 9459
+COMMON WORD
+unk 8948
+COMMON WORD
+new 8699
+COMMON WORD
+time 7951
+COMMON WORD
+maintenance 7676
+COMMON WORD
+science 7649
+COMMON WORD
+use 7518
+COMMON WORD
+june 6867
+COMMON WORD
+design 6830
+COMMON WORD
+engineering 6714
+COMMON WORD
+contact 6713
+COMMON WORD
+work 6679
+COMMON WORD
+systems 6632
+COMMON WORD
+informatics 6448
+COMMON WORD
+graduate 6442
+COMMON WORD
+drama 6351
+COMMON WORD
+media 6331
+COMMON WORD
+irvine 6304
+COMMON WORD
+quarter 6282
+COMMON WORD
+image 6280
+COMMON WORD
+academic 6269
+COMMON WORD
+home 6096
+COMMON WORD
+projects 5986
+COMMON WORD
+project 5924
+COMMON WORD
+program 5821
+COMMON WORD
+events 5816
+COMMON WORD
+news 5763
+COMMON WORD
+using 5671
+NUMBER OF UNIQUE SUBDOMAINS FOUND
+60
+SUBDOMAIN
+http://archive.ics.uci.edu    3
+SUBDOMAIN
+http://asterix.ics.uci.edu    7
+SUBDOMAIN
+http://cert.ics.uci.edu    1
+SUBDOMAIN
+http://computableplant.ics.uci.edu    17
+SUBDOMAIN
+http://flamingo.ics.uci.edu    46
+SUBDOMAIN
+http://fr.ics.uci.edu    3
+SUBDOMAIN
+http://graphics.ics.uci.edu    1
+SUBDOMAIN
+http://hobbes.ics.uci.edu    10
+SUBDOMAIN
+http://malek.ics.uci.edu    1
+SUBDOMAIN
+http://plrg.ics.uci.edu    1
+SUBDOMAIN
+http://riscit.ics.uci.edu    1
+SUBDOMAIN
+http://sdcl.ics.uci.edu    72
+SUBDOMAIN
+http://sli.ics.uci.edu    60
+SUBDOMAIN
+http://sparcfire.ics.uci.edu    3
+SUBDOMAIN
+http://tutors.ics.uci.edu    44
+SUBDOMAIN
+http://vision.ics.uci.edu    205
+SUBDOMAIN
+https://accessibility.ics.uci.edu    1
+SUBDOMAIN
+https://acoi.ics.uci.edu    54
+SUBDOMAIN
+https://archive.ics.uci.edu    1
+SUBDOMAIN
+https://cbcl.ics.uci.edu    2
+SUBDOMAIN
+https://checkin.ics.uci.edu    3
+SUBDOMAIN
+https://chenli.ics.uci.edu    9
+SUBDOMAIN
+https://cml.ics.uci.edu    101
+SUBDOMAIN
+https://code.ics.uci.edu    13
+SUBDOMAIN
+https://containers.ics.uci.edu    1
+SUBDOMAIN
+https://cradl.ics.uci.edu    1
+SUBDOMAIN
+https://create.ics.uci.edu    5
+SUBDOMAIN
+https://dgillen.ics.uci.edu    10
+SUBDOMAIN
+https://duttgroup.ics.uci.edu    1
+SUBDOMAIN
+https://emj.ics.uci.edu    41
+SUBDOMAIN
+https://evoke.ics.uci.edu    1
+SUBDOMAIN
+https://frost.ics.uci.edu    1
+SUBDOMAIN
+https://grape.ics.uci.edu    9
+SUBDOMAIN
+https://hai.ics.uci.edu    2
+SUBDOMAIN
+https://helpdesk.ics.uci.edu    3
+SUBDOMAIN
+https://hpi.ics.uci.edu    4
+SUBDOMAIN
+https://hub.ics.uci.edu    3
+SUBDOMAIN
+https://ipubmed.ics.uci.edu    1
+SUBDOMAIN
+https://isg.ics.uci.edu    100
+SUBDOMAIN
+https://jgarcia.ics.uci.edu    1
+SUBDOMAIN
+https://luci.ics.uci.edu    4
+SUBDOMAIN
+https://mcs.ics.uci.edu    84
+SUBDOMAIN
+https://mds.ics.uci.edu    11
+SUBDOMAIN
+https://mhcid.ics.uci.edu    16
+SUBDOMAIN
+https://mswe.ics.uci.edu    14
+SUBDOMAIN
+https://nalini.ics.uci.edu    2
+SUBDOMAIN
+https://ngs.ics.uci.edu    165
+SUBDOMAIN
+https://pgadmin.ics.uci.edu    2
+SUBDOMAIN
+https://redmiles.ics.uci.edu    4
+SUBDOMAIN
+https://rstudio-hub.ics.uci.edu    2
+SUBDOMAIN
+https://sdcl.ics.uci.edu    1
+SUBDOMAIN
+https://sli.ics.uci.edu    1
+SUBDOMAIN
+https://speedtest.ics.uci.edu    1
+SUBDOMAIN
+https://studentcouncil.ics.uci.edu    29
+SUBDOMAIN
+https://swiki.ics.uci.edu    1665
+SUBDOMAIN
+https://tad.ics.uci.edu    2
+SUBDOMAIN
+https://transformativeplay.ics.uci.edu    37
+SUBDOMAIN
+https://unite.ics.uci.edu    10
+SUBDOMAIN
+https://wics.ics.uci.edu    1
+SUBDOMAIN
+https://wiki.ics.uci.edu    2
